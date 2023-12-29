@@ -104,7 +104,7 @@ interface AddEthereumChainParameter {
 }
 
 const ETH_GOERLI: AddEthereumChainParameter = {
-  chainId: '0x5',
+  chainId: SupportedChainIdHex.ETH_GOERLI,
   blockExplorerUrls: ['https://goerli.etherscan.io'],
   chainName: 'Goerli Test Network',
   nativeCurrency: {
@@ -116,7 +116,7 @@ const ETH_GOERLI: AddEthereumChainParameter = {
 }
 
 const AVAX_FUJI: AddEthereumChainParameter = {
-  chainId: '0xa869',
+  chainId: SupportedChainIdHex.AVAX_FUJI,
   blockExplorerUrls: ['https://testnet.snowtrace.io/'],
   chainName: 'Avalanche FUJI C-Chain',
   nativeCurrency: {
@@ -183,7 +183,7 @@ export const CHAIN_ID_HEXES_TO_PARAMETERS: ChainIdToChainParameters = {
   [SupportedChainIdHex.ETH_GOERLI]: ETH_GOERLI,
   [SupportedChainIdHex.AVAX_FUJI]: AVAX_FUJI,
   [SupportedChainIdHex.ARB_GOERLI]: ARB_GOERLI,
-  // [SupportedChainId.BASE_GOERLI]: BASE_GOERLI,
-  [SupportedChainId.OP_GOERLI]: OP_GOERLI,
-  [SupportedChainId.POLYGON_MUMBAI]: POLYGON_MUMBAI,
+  // [SupportedChainIdHex.BASE_GOERLI]: BASE_GOERLI,
+  [SupportedChainIdHex.OP_GOERLI]: OP_GOERLI,
+  [SupportedChainIdHex.POLYGON_MUMBAI]: POLYGON_MUMBAI,
 }
