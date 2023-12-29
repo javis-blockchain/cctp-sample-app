@@ -5,7 +5,7 @@ export enum Chain {
   ETH = 'ETH',
   AVAX = 'AVAX',
   ARB = 'ARB',
-  // BASE = 'BASE',
+  BASE = 'BASE',
   // NOBLE = 'NOBLE',
   OP = 'OP',
   POLYGON = 'POLYGON',
@@ -18,7 +18,7 @@ export enum SupportedChainId {
   ETH_GOERLI = 5,
   AVAX_FUJI = 43113,
   ARB_GOERLI = 421613,
-  // BASE_GOERLI = 84531,
+  BASE_GOERLI = 84531,
   OP_GOERLI = 420,
   POLYGON_MUMBAI = 80001,
 }
@@ -31,7 +31,7 @@ export const SupportedChainIdHex = {
   ETH_GOERLI: '0x5',
   AVAX_FUJI: '0xa869',
   ARB_GOERLI: '0x66eed',
-  // BASE_GOERLI: '0x14a33',
+  BASE_GOERLI: '0x14a33',
   OP_GOERLI: '0x1a4',
   POLYGON_MUMBAI: '0x13881',
 }
@@ -48,7 +48,7 @@ export const CHAIN_TO_CHAIN_ID: ChainToChainIdMap = {
   [Chain.ETH]: SupportedChainId.ETH_GOERLI,
   [Chain.AVAX]: SupportedChainId.AVAX_FUJI,
   [Chain.ARB]: SupportedChainId.ARB_GOERLI,
-  // [Chain.BASE]: SupportedChainId.BASE_GOERLI,
+  [Chain.BASE]: SupportedChainId.BASE_GOERLI,
   [Chain.OP]: SupportedChainId.OP_GOERLI,
   [Chain.POLYGON]: SupportedChainId.POLYGON_MUMBAI,
 }
@@ -64,7 +64,7 @@ export const CHAIN_TO_CHAIN_NAME: ChainToChainNameMap = {
   ETH: 'Ethereum',
   AVAX: 'Avalanche',
   ARB: 'Arbitrum',
-  // BASE: 'Base',
+  BASE: 'Base',
   OP: 'Optimism',
   POLYGON: 'Polygon',
 }
@@ -139,17 +139,17 @@ const ARB_GOERLI: AddEthereumChainParameter = {
   rpcUrls: ['https://goerli-rollup.arbitrum.io/rpc'],
 }
 
-// const BASE_GOERLI: AddEthereumChainParameter = {
-//   chainId: SupportedChainIdHex.BASE_GOERLI,
-//   blockExplorerUrls: ['https://goerli.basescan.org/'],
-//   chainName: 'Base Goerli Testnet',
-//   nativeCurrency: {
-//     name: 'Ethereum',
-//     symbol: 'ETH',
-//     decimals: 18,
-//   },
-//   rpcUrls: ['https://base-goerli.publicnode.com'],
-// }
+const BASE_GOERLI: AddEthereumChainParameter = {
+  chainId: SupportedChainIdHex.BASE_GOERLI,
+  blockExplorerUrls: ['https://goerli.basescan.org/'],
+  chainName: 'Base Goerli Testnet',
+  nativeCurrency: {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    decimals: 18,
+  },
+  rpcUrls: ['https://base-goerli.publicnode.com'],
+}
 
 const OP_GOERLI: AddEthereumChainParameter = {
   chainId: SupportedChainIdHex.OP_GOERLI,
@@ -183,7 +183,7 @@ export const CHAIN_ID_HEXES_TO_PARAMETERS: ChainIdToChainParameters = {
   [SupportedChainIdHex.ETH_GOERLI]: ETH_GOERLI,
   [SupportedChainIdHex.AVAX_FUJI]: AVAX_FUJI,
   [SupportedChainIdHex.ARB_GOERLI]: ARB_GOERLI,
-  // [SupportedChainIdHex.BASE_GOERLI]: BASE_GOERLI,
+  [SupportedChainIdHex.BASE_GOERLI]: BASE_GOERLI,
   [SupportedChainIdHex.OP_GOERLI]: OP_GOERLI,
   [SupportedChainIdHex.POLYGON_MUMBAI]: POLYGON_MUMBAI,
 }
