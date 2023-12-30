@@ -4,6 +4,7 @@ import classnames from 'classnames'
 
 import logo from 'assets/logo.svg'
 import ConnectWallet from 'components/ConnectWallet/ConnectWallet'
+import KeplrConnectWallet from 'components/Keplr/KeplrConnectWallet'
 import { routes } from 'pages/Router'
 
 import type { RouteConfig } from 'pages/Router'
@@ -48,6 +49,8 @@ function Nav() {
           ))}
 
         <ConnectWallet />
+
+        <KeplrConnectWallet />
       </div>
     </nav>
   )

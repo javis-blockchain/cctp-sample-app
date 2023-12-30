@@ -1,20 +1,15 @@
 import { useCallback, useState } from 'react'
 
 import { Button, Fade, Menu, MenuItem } from '@mui/material'
-import { useWeb3React } from '@web3-react/core'
 
-import ConnectWalletDialog from 'components/ConnectWallet/ConnectWalletDialog'
-import { useEagerConnect } from 'hooks/useEagerConnect'
-import { getAddressAbbreviation } from 'utils'
+import KeplrConnectWalletDialog from 'components/Keplr/KeplrConnectWalletDialog'
+import { SupportedChainIdHex } from 'constants/chains'
+import { useKeplrConnect } from 'hooks/useKeplrConnect'
 
-import type { Web3Provider } from '@ethersproject/providers'
-import type { AbstractConnector } from '@web3-react/abstract-connector'
-
-const ConnectWallet = () => {
-  const { activate, active, account, deactivate, error } =
-    useWeb3React<Web3Provider>()
-  useEagerConnect()
-
+const KeplrConnectWallet = () => {
+  const cosmosChainId = SupportedChainIdHex.NOBLE_GRAND
+  let { account, active, error } = useKeplrConnect()
+  console.log('keplr account:%s, active:%s, error:%s', account, active, error)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isConnectWalletDialogOpen, setIsConnectWalletDialogOpen] =
     useState<boolean>(false)
@@ -40,15 +35,21 @@ const ConnectWallet = () => {
     handleMenuClose()
   }, [account, handleMenuClose])
 
-  const handleConnect = async (connector: AbstractConnector) => {
+  const handleConnect = async () => {
     closeConnectWalletDialog()
-    await activate(connector)
+    await window.keplr?.enable(cosmosChainId)
+    if (!window.keplr) {
+      error = 'Please Install Keplr Wallet Extension'
+    } else {
+      const accounts = await window.keplr.getKey(cosmosChainId)
+      account = accounts.bech32Address
+      active = true
+    }
   }
 
   const handleDisconnect = useCallback(() => {
-    deactivate()
     handleMenuClose()
-  }, [deactivate, handleMenuClose])
+  }, [handleMenuClose])
 
   return (
     <>
@@ -60,14 +61,14 @@ const ConnectWallet = () => {
           aria-expanded={open ? 'true' : undefined}
           onClick={handleMenuClick}
         >
-          {getAddressAbbreviation(account)}
+          {account}
         </Button>
       ) : (
         <div className="relative inline">
-          <Button onClick={openConnectWalletDialog}>Connect EVM Wallet</Button>
-          {error != null && (
+          <Button onClick={openConnectWalletDialog}>Connect Keplr</Button>
+          {error !== '' && (
             <span className="absolute left-0 top-10 text-sm text-redhot-500">
-              {error?.message}
+              {error}
             </span>
           )}
         </div>
@@ -85,7 +86,7 @@ const ConnectWallet = () => {
         <MenuItem onClick={handleCopy}>Copy Address</MenuItem>
         <MenuItem onClick={handleDisconnect}>Disconnect</MenuItem>
       </Menu>
-      <ConnectWalletDialog
+      <KeplrConnectWalletDialog
         handleClose={closeConnectWalletDialog}
         handleConnect={handleConnect}
         open={isConnectWalletDialogOpen}
@@ -94,4 +95,4 @@ const ConnectWallet = () => {
   )
 }
 
-export default ConnectWallet
+export default KeplrConnectWallet

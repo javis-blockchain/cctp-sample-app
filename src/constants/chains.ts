@@ -6,7 +6,7 @@ export enum Chain {
   AVAX = 'AVAX',
   ARB = 'ARB',
   BASE = 'BASE',
-  // NOBLE = 'NOBLE',
+  NOBLE = 'NOBLE',
   OP = 'OP',
   POLYGON = 'POLYGON',
 }
@@ -34,6 +34,7 @@ export const SupportedChainIdHex = {
   BASE_GOERLI: '0x14a33',
   OP_GOERLI: '0x1a4',
   POLYGON_MUMBAI: '0x13881',
+  NOBLE_GRAND: 'grand-1',
 }
 
 interface ChainToChainIdMap {
@@ -67,6 +68,7 @@ export const CHAIN_TO_CHAIN_NAME: ChainToChainNameMap = {
   BASE: 'Base',
   OP: 'Optimism',
   POLYGON: 'Polygon',
+  NOBLE: 'Noble',
 }
 
 /**
@@ -175,6 +177,18 @@ const POLYGON_MUMBAI: AddEthereumChainParameter = {
   rpcUrls: ['https://polygon-mumbai.blockpi.network/v1/rpc/public'],
 }
 
+const NOBLE_GRAND: AddEthereumChainParameter = {
+  chainId: SupportedChainIdHex.NOBLE_GRAND,
+  blockExplorerUrls: ['https://testnet.mintscan.io/noble-testnet/'],
+  chainName: 'Noble Testnet',
+  nativeCurrency: {
+    name: 'USDC',
+    symbol: 'uusdc',
+    decimals: 6,
+  },
+  rpcUrls: ['https://rpc.testnet.noble.strange.love'],
+}
+
 interface ChainIdToChainParameters {
   [key: string]: AddEthereumChainParameter
 }
@@ -186,4 +200,5 @@ export const CHAIN_ID_HEXES_TO_PARAMETERS: ChainIdToChainParameters = {
   [SupportedChainIdHex.BASE_GOERLI]: BASE_GOERLI,
   [SupportedChainIdHex.OP_GOERLI]: OP_GOERLI,
   [SupportedChainIdHex.POLYGON_MUMBAI]: POLYGON_MUMBAI,
+  [SupportedChainIdHex.NOBLE_GRAND]: NOBLE_GRAND,
 }

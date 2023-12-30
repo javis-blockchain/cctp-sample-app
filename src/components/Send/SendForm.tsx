@@ -60,6 +60,11 @@ const CHAIN_SELECT_ITEMS: SelectItem[] = [
     label: CHAIN_TO_CHAIN_NAME[Chain.BASE],
     icon: CHAIN_ICONS[Chain.BASE],
   },
+  {
+    value: Chain.NOBLE,
+    label: CHAIN_TO_CHAIN_NAME[Chain.NOBLE],
+    icon: CHAIN_ICONS[Chain.NOBLE],
+  },
 ]
 
 export const DEFAULT_FORM_INPUTS: TransactionInputs = {
@@ -76,11 +81,15 @@ interface Props {
 }
 
 const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
+  const { source, target, address, amount } = formInputs
+  console.log('source:%s, target:%s', source, target)
   const { account, active, chainId } = useWeb3React<Web3Provider>()
+  console.log('account:%s, active:%s, chainId:%s', account, active, chainId)
+
   const USDC_ADDRESS = getUSDCContractAddress(chainId)
 
   const [walletUSDCBalance, setWalletUSDCBalance] = useState(0)
-  const { source, target, address, amount } = formInputs
+
   const [isFormValid, setIsFormValid] = useState(false)
   const balance = useTokenBalance(USDC_ADDRESS, account ?? '')
 
