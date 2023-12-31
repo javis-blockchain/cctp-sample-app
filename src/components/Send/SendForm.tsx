@@ -142,7 +142,7 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
   }, [address, account, active])
 
   const getAmountHelperText = useMemo(() => {
-    const balanceAvailable = `${walletUSDCBalance.toLocaleString()} available`
+    const balanceAvailable = `${walletUSDCBalance.toLocaleString()} USDC available`
     if (amount !== '' && (isNaN(+amount) || +amount <= 0)) {
       return `Enter a valid amount, ${balanceAvailable}`
     }
@@ -283,7 +283,7 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
                   onClick={handleAddMax}
                   disabled={walletUSDCBalance === 0}
                 >
-                  ADD MAX
+                  MAX
                 </Button>
               </InputAdornment>
             ),

@@ -8,8 +8,13 @@ import { useKeplrConnect } from 'hooks/useKeplrConnect'
 
 const KeplrConnectWallet = () => {
   const cosmosChainId = SupportedChainIdHex.NOBLE_GRAND
-  let { account, active, error } = useKeplrConnect()
-  console.log('keplr account:%s, active:%s, error:%s', account, active, error)
+  let { keplrAccount, keplrActive, keplrError } = useKeplrConnect()
+  console.log(
+    'keplrAccount:%s, keplrActive:%s, keplrError:%s',
+    keplrAccount,
+    keplrActive,
+    keplrError
+  )
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isConnectWalletDialogOpen, setIsConnectWalletDialogOpen] =
     useState<boolean>(false)
@@ -31,19 +36,19 @@ const KeplrConnectWallet = () => {
   }, [])
 
   const handleCopy = useCallback(async () => {
-    await navigator.clipboard.writeText(account ?? '')
+    await navigator.clipboard.writeText(keplrAccount ?? '')
     handleMenuClose()
-  }, [account, handleMenuClose])
+  }, [keplrAccount, handleMenuClose])
 
   const handleConnect = async () => {
     closeConnectWalletDialog()
     await window.keplr?.enable(cosmosChainId)
     if (!window.keplr) {
-      error = 'Please Install Keplr Wallet Extension'
+      keplrError = 'Please Install Keplr Wallet Extension'
     } else {
       const accounts = await window.keplr.getKey(cosmosChainId)
-      account = accounts.bech32Address
-      active = true
+      keplrAccount = accounts.bech32Address
+      keplrActive = true
     }
   }
 
@@ -53,7 +58,7 @@ const KeplrConnectWallet = () => {
 
   return (
     <>
-      {account && active ? (
+      {keplrAccount && keplrActive ? (
         <Button
           id="connected-wallet-button"
           aria-controls={open ? 'connected-wallet-menu' : undefined}
@@ -61,14 +66,14 @@ const KeplrConnectWallet = () => {
           aria-expanded={open ? 'true' : undefined}
           onClick={handleMenuClick}
         >
-          {account}
+          {keplrAccount}
         </Button>
       ) : (
         <div className="relative inline">
           <Button onClick={openConnectWalletDialog}>Connect Keplr</Button>
-          {error !== '' && (
+          {keplrError !== '' && (
             <span className="absolute left-0 top-10 text-sm text-redhot-500">
-              {error}
+              {keplrError}
             </span>
           )}
         </div>
