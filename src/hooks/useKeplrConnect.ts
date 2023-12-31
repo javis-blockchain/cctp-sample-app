@@ -4,10 +4,10 @@ import { SupportedChainIdHex } from 'constants/chains'
 
 const cosmosChainId = SupportedChainIdHex.NOBLE_GRAND
 
+let account = ''
+let active = false
+let error = ''
 export function useKeplrConnect() {
-  let account = ''
-  let active = false
-  let error = ''
   useEffect(() => {
     const initKeplrWallet = async () => {
       if (!window.keplr) {
