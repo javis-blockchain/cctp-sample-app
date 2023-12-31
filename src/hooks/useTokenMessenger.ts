@@ -1,17 +1,22 @@
 import { useCallback } from 'react'
 
+import { SigningStargateClient } from '@cosmjs/stargate'
 import { useWeb3React } from '@web3-react/core'
 import { bech32 } from 'bech32'
 import { type BigNumber, ethers } from 'ethers'
 
+import { SupportedChainIdHex } from 'constants/chains'
 import { TokenMessenger__factory } from 'typechain/index'
 import { addressToBytes32 } from 'utils'
 import { getTokenMessengerContractAddress } from 'utils/addresses'
+
+import { nobleGrandTestNet } from './useKeplrConnect'
 
 import type {
   TransactionResponse,
   Web3Provider,
 } from '@ethersproject/providers'
+import type { AccountData } from '@keplr-wallet/types'
 import type { DestinationDomain, SupportedChainId } from 'constants/chains'
 
 /**
@@ -67,8 +72,66 @@ const useTokenMessenger = (chainId: SupportedChainId | undefined) => {
     [TOKEN_MESSENGER_CONTRACT_ADDRESS, library]
   )
 
+  const depositForBurnFromNoble = useCallback(
+    async (
+      amount: BigNumber,
+      destinationDomain: DestinationDomain,
+      rawMintRecipient: string
+    ) => {
+      const cosmosChainId = SupportedChainIdHex.NOBLE_GRAND
+      const accounts = await window.keplr?.getKey(cosmosChainId)
+      // Mint recipient 0x7846d5ef33Be01e7386F80A2Ab59cb0Bea7d40Aa, left padded with 0's to 32 bytes
+      const cleanedMintRecipient = rawMintRecipient.replace(/^0x/, '')
+      const zeroesNeeded = 64 - cleanedMintRecipient.length
+      const mintRecipient = '0'.repeat(zeroesNeeded) + cleanedMintRecipient
+      const buffer = Buffer.from(mintRecipient, 'hex')
+      const mintRecipientBytes = new Uint8Array(buffer)
+
+      const msg = {
+        typeUrl: '/circle.cctp.v1.MsgDepositForBurn',
+        value: {
+          from: accounts?.address,
+          amount: amount.toString(),
+          destinationDomain,
+          mintRecipient: mintRecipientBytes,
+          burnToken: 'uusdc',
+        },
+      }
+
+      const fee = {
+        amount: [
+          {
+            denom: 'uusdc',
+            amount: '0',
+          },
+        ],
+        gas: '200000',
+      }
+      const memo = ''
+      if (window.keplr) {
+        const offlineSigner = window.keplr.getOfflineSigner(cosmosChainId)
+        const accountData: AccountData = (await offlineSigner.getAccounts())[0]
+        const signingClient = await SigningStargateClient.connectWithSigner(
+          nobleGrandTestNet.rpc,
+          offlineSigner
+        )
+        return await signingClient
+          .signAndBroadcast(accountData.address, [msg], fee, memo)
+          .then((result) => {
+            return result
+          })
+          .catch((error: Error) => {
+            throw new Error(error.message)
+          })
+      }
+      return null
+    },
+    []
+  )
+
   return {
     depositForBurn,
+    depositForBurnFromNoble,
   }
 }
 

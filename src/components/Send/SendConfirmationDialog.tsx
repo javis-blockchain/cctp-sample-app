@@ -16,13 +16,14 @@ import { parseUnits } from 'ethers/lib/utils'
 
 import NetworkAlert from 'components/NetworkAlert/NetworkAlert'
 import TransactionDetails from 'components/TransactionDetails/TransactionDetails'
-import { CHAIN_TO_CHAIN_ID, DestinationDomain } from 'constants/chains'
+import { Chain, CHAIN_TO_CHAIN_ID, DestinationDomain } from 'constants/chains'
 import { DEFAULT_DECIMALS } from 'constants/tokens'
 import {
   TransactionStatus,
   TransactionType,
   useTransactionContext,
 } from 'contexts/AppContext'
+import { useKeplrConnect } from 'hooks/useKeplrConnect'
 import useTokenAllowance from 'hooks/useTokenAllowance'
 import useTokenApproval from 'hooks/useTokenApproval'
 import useTokenMessenger from 'hooks/useTokenMessenger'
@@ -34,7 +35,6 @@ import {
 
 import type { Web3Provider } from '@ethersproject/providers'
 import type { SxProps } from '@mui/material'
-import type { Chain } from 'constants/chains'
 import type { TransactionInputs } from 'contexts/AppContext'
 import type { BigNumber } from 'ethers'
 
@@ -58,12 +58,12 @@ const SendConfirmationDialog: React.FC<Props> = ({
   const [isAllowanceSufficient, setIsAllowanceSufficient] = useState(false)
   const [isApproving, setIsApproving] = useState(false)
   const [isSending, setIsSending] = useState(false)
-
+  const { keplrAccount, keplrActive } = useKeplrConnect()
   const USDC_ADDRESS = getUSDCContractAddress(chainId)
   const TOKEN_MESSENGER_ADDRESS = getTokenMessengerContractAddress(chainId)
 
   const { approve } = useTokenApproval(USDC_ADDRESS, TOKEN_MESSENGER_ADDRESS)
-  const { depositForBurn } = useTokenMessenger(chainId)
+  const { depositForBurn, depositForBurnFromNoble } = useTokenMessenger(chainId)
   const allowance = useTokenAllowance(
     USDC_ADDRESS,
     account ?? '',
@@ -117,16 +117,27 @@ const SendConfirmationDialog: React.FC<Props> = ({
 
     setIsSending(true)
     try {
-      const response = await depositForBurn(
-        amountToSend,
-        DestinationDomain[target as Chain],
-        address,
-        USDC_ADDRESS
-      )
-      if (!response) return
+      let hash = ''
+      if (formInputs.source === Chain.NOBLE) {
+        const response = await depositForBurnFromNoble(
+          amountToSend,
+          DestinationDomain[target as Chain],
+          address
+        )
+        if (!response) return
+        hash = response.transactionHash
+      } else {
+        const response = await depositForBurn(
+          amountToSend,
+          DestinationDomain[target as Chain],
+          address,
+          USDC_ADDRESS
+        )
+        if (!response) return
 
-      const { hash } = response
-
+        hash = response.hash
+      }
+      console.log('hash:%s', hash)
       const transaction = {
         ...formInputs,
         hash,
@@ -167,7 +178,7 @@ const SendConfirmationDialog: React.FC<Props> = ({
         <Button size="large" color="secondary" onClick={handleClose}>
           BACK
         </Button>
-        {!isAllowanceSufficient ? (
+        {!isAllowanceSufficient && formInputs.source !== Chain.NOBLE ? (
           <LoadingButton
             size="large"
             onClick={handleApprove}
@@ -183,7 +194,9 @@ const SendConfirmationDialog: React.FC<Props> = ({
             size="large"
             onClick={handleSend}
             disabled={
-              isSending || CHAIN_TO_CHAIN_ID[formInputs.source] !== chainId
+              isSending ||
+              (CHAIN_TO_CHAIN_ID[formInputs.source] !== chainId &&
+                formInputs.source !== Chain.NOBLE)
             }
             loading={isSending}
           >

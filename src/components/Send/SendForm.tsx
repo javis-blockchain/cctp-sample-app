@@ -86,7 +86,7 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
   const { source, target, address, amount } = formInputs
   console.log('source:%s, target:%s', source, target)
   const { account, active, chainId } = useWeb3React<Web3Provider>()
-  const { keplrAccount, keplrActive, keplrError } = useKeplrConnect()
+  const { keplrAccount, keplrActive } = useKeplrConnect()
 
   const USDC_ADDRESS = getUSDCContractAddress(chainId)
 

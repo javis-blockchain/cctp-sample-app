@@ -25,9 +25,11 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "@cosmjs/stargate": "^0.32.2",
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
     "@keplr-wallet/types": "^0.12.55",
+    "@keplr-wallet/unit": "^0.12.55",
     "@mui/icons-material": "^5.8.4",
     "@mui/lab": "^5.0.0-alpha.98",
     "@mui/material": "^5.10.0",
@@ -36,6 +38,8 @@
     "@web3-react/types": "^6.0.7",
     "axios": "^0.27.2",
     "bech32": "^2.0.0",
+    "crypto": "npm:crypto-browserify",
+    "crypto-browserify": "^3.12.0",
     "ethers": "5.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
