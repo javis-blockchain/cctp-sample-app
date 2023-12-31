@@ -8,7 +8,7 @@ import { useKeplrConnect } from 'hooks/useKeplrConnect'
 
 const KeplrConnectWallet = () => {
   const cosmosChainId = SupportedChainIdHex.NOBLE_GRAND
-  let { keplrAccount, keplrActive, keplrError } = useKeplrConnect()
+  const { keplrAccount, keplrActive, keplrError } = useKeplrConnect()
   console.log(
     'keplrAccount:%s, keplrActive:%s, keplrError:%s',
     keplrAccount,
@@ -43,13 +43,13 @@ const KeplrConnectWallet = () => {
   const handleConnect = async () => {
     closeConnectWalletDialog()
     await window.keplr?.enable(cosmosChainId)
-    if (!window.keplr) {
-      keplrError = 'Please Install Keplr Wallet Extension'
-    } else {
-      const accounts = await window.keplr.getKey(cosmosChainId)
-      keplrAccount = accounts.bech32Address
-      keplrActive = true
-    }
+    // if (!window.keplr) {
+    //   keplrError = 'Please Install Keplr Wallet Extension'
+    // } else {
+    //   const accounts = await window.keplr.getKey(cosmosChainId)
+    //   keplrAccount = accounts.bech32Address
+    //   keplrActive = true
+    // }
   }
 
   const handleDisconnect = useCallback(() => {

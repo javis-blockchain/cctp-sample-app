@@ -31,11 +31,11 @@ async function addChainToKeplr() {
   await window.keplr?.experimentalSuggestChain(nobleGrandTestNet)
 }
 
-const nobleGrandTestNet = {
+export const nobleGrandTestNet = {
   chainId: 'grand-1',
   chainName: 'Noble',
   rpc: 'https://rpc.testnet.noble.strange.love',
-  rest: 'https://api.testnet.noble.strange.love/',
+  rest: 'https://api.testnet.noble.strange.love',
   bip44: {
     coinType: 118,
   },
@@ -72,7 +72,7 @@ const nobleGrandTestNet = {
   ],
 }
 
-const nobleMainNet = {
+export const nobleMainNet = {
   chainId: 'noble-1',
   chainName: 'Noble',
   rpc: 'https://rpc-noble.keplr.app',

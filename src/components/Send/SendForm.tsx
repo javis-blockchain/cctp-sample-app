@@ -17,6 +17,8 @@ import { CHAIN_ICONS } from 'assets/chains'
 import NetworkAlert from 'components/NetworkAlert/NetworkAlert'
 import { Chain, CHAIN_TO_CHAIN_ID, CHAIN_TO_CHAIN_NAME } from 'constants/chains'
 import { DEFAULT_DECIMALS } from 'constants/tokens'
+import { useKeplrBalance } from 'hooks/useKeplrBalance'
+import { useKeplrConnect } from 'hooks/useKeplrConnect'
 import useTokenBalance from 'hooks/useTokenBalance'
 import { getUSDCContractAddress } from 'utils/addresses'
 
@@ -84,14 +86,19 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
   const { source, target, address, amount } = formInputs
   console.log('source:%s, target:%s', source, target)
   const { account, active, chainId } = useWeb3React<Web3Provider>()
-  console.log('account:%s, active:%s, chainId:%s', account, active, chainId)
+  const { keplrAccount, keplrActive, keplrError } = useKeplrConnect()
 
   const USDC_ADDRESS = getUSDCContractAddress(chainId)
 
   const [walletUSDCBalance, setWalletUSDCBalance] = useState(0)
 
   const [isFormValid, setIsFormValid] = useState(false)
-  const balance = useTokenBalance(USDC_ADDRESS, account ?? '')
+  let balance = useTokenBalance(USDC_ADDRESS, account ?? '')
+
+  const keplrBalance = useKeplrBalance()
+  if (source === Chain.NOBLE) {
+    balance = keplrBalance
+  }
 
   const updateFormIsValid = useCallback(() => {
     const isValid =
@@ -99,22 +106,23 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
       target !== '' &&
       source !== target &&
       address !== '' &&
-      address === account &&
       amount !== '' &&
       !isNaN(+amount) &&
       +amount > 0 &&
       +amount <= walletUSDCBalance &&
-      CHAIN_TO_CHAIN_ID[source] === chainId
+      ((target === Chain.NOBLE && address.startsWith('noble')) ||
+        (target !== Chain.NOBLE && address.startsWith('0x')))
     setIsFormValid(isValid)
-  }, [source, target, address, account, amount, walletUSDCBalance, chainId])
+  }, [source, target, address, amount, walletUSDCBalance])
 
   useEffect(() => {
-    if (account && active) {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if ((account && active) ?? (keplrAccount && keplrActive)) {
       setWalletUSDCBalance(Number(formatUnits(balance, DEFAULT_DECIMALS)))
     } else {
       setWalletUSDCBalance(0)
     }
-  }, [account, active, balance])
+  }, [account, active, balance, keplrAccount, keplrActive])
 
   useEffect(updateFormIsValid, [updateFormIsValid])
 
@@ -132,14 +140,15 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
   )
 
   const getAddressHelperText = useMemo(() => {
-    if (address !== '' && (!account || !active)) {
-      return 'Please connect your wallet and check your selected network'
-    }
-    if (address !== '' && address !== account) {
-      return "Destination address doesn't match active wallet address"
+    if (
+      address !== '' &&
+      ((target === Chain.NOBLE && !address.startsWith('noble')) ||
+        (target !== Chain.NOBLE && !address.startsWith('0x')))
+    ) {
+      return 'Destination address wrong format'
     }
     return ' '
-  }, [address, account, active])
+  }, [address, target])
 
   const getAmountHelperText = useMemo(() => {
     const balanceAvailable = `${walletUSDCBalance.toLocaleString()} USDC available`
@@ -172,7 +181,7 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
   const handleCopyFromWallet = () => {
     handleUpdateForm((state) => ({
       ...state,
-      address: account ?? '',
+      address: target === Chain.NOBLE ? keplrAccount ?? '' : account ?? '',
     }))
   }
 
@@ -192,9 +201,11 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
             id="source"
             label="Source"
             error={
-              account !== null &&
-              active &&
-              CHAIN_TO_CHAIN_ID[source] !== chainId
+              (account !== null &&
+                active &&
+                CHAIN_TO_CHAIN_ID[source] !== chainId &&
+                source !== Chain.NOBLE) ||
+              (keplrAccount === '' && source === Chain.NOBLE)
             }
             value={source}
             onChange={(event) => handleSourceChange(event.target.value)}
@@ -231,7 +242,11 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
           label="Destination Address"
           variant="outlined"
           value={address}
-          error={address !== '' && address !== account}
+          error={
+            address !== '' &&
+            ((target === Chain.NOBLE && !address.startsWith('noble')) ||
+              (target !== Chain.NOBLE && !address.startsWith('0x')))
+          }
           helperText={getAddressHelperText}
           onChange={(event) =>
             handleUpdateForm((state) => ({
@@ -246,7 +261,10 @@ const SendForm = ({ handleNext, handleUpdateForm, formInputs }: Props) => {
                 <Button
                   color="secondary"
                   onClick={handleCopyFromWallet}
-                  disabled={!account || !active}
+                  disabled={
+                    (target !== Chain.NOBLE && (!account || !active)) ||
+                    (target === Chain.NOBLE && (!keplrAccount || !keplrActive))
+                  }
                 >
                   COPY FROM WALLET
                 </Button>
